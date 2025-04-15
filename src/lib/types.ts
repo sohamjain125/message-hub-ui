@@ -1,8 +1,9 @@
-
 // Auth Types
 export interface User {
   id: string;
   username: string;
+  phoneNumber: string;
+  countryCode: string;
 }
 
 export interface AuthState {
@@ -12,18 +13,27 @@ export interface AuthState {
 }
 
 export interface LoginRequest {
-  username: string;
+  userIdentifier: string;
   password: string;
 }
 
 export interface LoginResponse {
-  token: string;
-  user: User;
+  data: {
+    userId: string;
+    phoneNumber: string;
+    countryCode: string;
+    userName: string;
+  };
+  accessToken: string;
+  refreshToken: string;
+  status: number;
+  message: string;
 }
 
 // Chat Types
 export interface Message {
   id: string;
+  _id?: string;
   chatId: string;
   senderId: string;
   content: string;
@@ -65,4 +75,5 @@ export interface ApiResponse<T> {
   status: number;
   message: string;
   data: T | null;
+  accessToken?: string;
 }

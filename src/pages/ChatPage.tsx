@@ -1,4 +1,3 @@
-
 import ChatSidebar from '@/components/ChatSidebar';
 import ChatWindow from '@/components/ChatWindow';
 import MessageInput from '@/components/MessageInput';

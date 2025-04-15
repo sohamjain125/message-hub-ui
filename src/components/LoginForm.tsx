@@ -8,15 +8,15 @@ import { Eye, EyeOff, User, Key } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const LoginForm = () => {
-  const [username, setUsername] = useState('');
+  const [userIdentifier, setUserIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { login, loading } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) return;
-    await login({ username, password });
+    if (!userIdentifier || !password) return;
+    await login({ userIdentifier, password });
   };
 
   return (
@@ -24,20 +24,20 @@ const LoginForm = () => {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Message Hub</CardTitle>
         <CardDescription className="text-center">
-          Enter your username or phone number to sign in
+          Enter your userIdentifier or phone number to sign in
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username or Phone Number</Label>
+            <Label htmlFor="userIdentifier">userIdentifier or Phone Number</Label>
             <div className="relative">
               <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
               <Input
-                id="username"
-                placeholder="Enter username or phone"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="userIdentifier"
+                placeholder="Enter userIdentifier or phone"
+                value={userIdentifier}
+                onChange={(e) => setUserIdentifier(e.target.value)}
                 className="pl-10"
                 required
               />

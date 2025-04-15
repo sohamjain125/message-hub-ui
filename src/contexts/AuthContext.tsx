@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { AuthState, User, LoginRequest } from '@/lib/types';
 import { authService } from '@/services/authService';
@@ -9,6 +8,7 @@ interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +28,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = localStorage.getItem('access-token');
     const user = authService.getCurrentUser();
     
+    console.log('AuthProvider: Initial auth check', { token, user });
+    
     if (token && user) {
       setAuthState({
         user,
@@ -44,42 +46,64 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       const data = await authService.login(credentials);
       
+      // Map the response data to our User type
+      const userData = {
+        id: data.data.userId,
+        username: data.data.userName,
+        phoneNumber: data.data.phoneNumber,
+        countryCode: data.data.countryCode
+      };
+      
+      console.log('AuthProvider: Login successful', { user: userData, token: data.accessToken });
+      
       setAuthState({
-        user: data.user,
-        token: data.token,
+        user: userData,
+        token: data.accessToken,
         isAuthenticated: true,
       });
       
       navigate('/chats');
     } catch (error) {
+      console.error('AuthProvider: Login failed', error);
       toast({
         title: "Login Failed",
         description: error instanceof Error ? error.message : "An error occurred during login",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
+    console.log('AuthProvider: Logging out');
     authService.logout();
     setAuthState({
       user: null,
       token: null,
       isAuthenticated: false,
     });
+    navigate('/login');
   };
 
+  // Don't render children until auth is ready
+  if (loading) {
+    return null;
+  }
+
+  const value = {
+    ...authState,
+    login,
+    logout,
+    loading,
+    token: authState.token
+  };
+
+  console.log('AuthProvider: Current auth state', value);
+
   return (
-    <AuthContext.Provider
-      value={{
-        ...authState,
-        login,
-        logout,
-        loading,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
